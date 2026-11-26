@@ -1,0 +1,46 @@
+{
+  "//": "Session E (workspace-b): ONE confluence_recall call whose query is a phrase spoken in session A (workspace-a), then a final text answer. It runs right after A so the writer is within recall.maxSessions (3). The rules match the recall tool result (success renders a hit ref; failure renders \"No literal matches\"), not the word \"session:\", which the host system-reminder also contains.",
+  "default": {
+    "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E recall session"
+    },
+    {
+      "when": {
+        "messagesIncludes": "No literal matches"
+      },
+      "text": "MOCK_FALLBACK: recall returned no literal match; ending the turn."
+    },
+    {
+      "when": {
+        "messagesIncludes": "confluence_recall"
+      },
+      "text": "Workspace-bus recall confirmed."
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "MOCK_FALLBACK: recall returned no rendered result; ending the turn."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_recall",
+        "input": {
+          "query": "workspace-bus E2E harness gotcha"
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}

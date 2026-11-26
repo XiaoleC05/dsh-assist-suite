@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "输入增强",
+    "description": "为 DSH 输入框提供语音输入与提示词优化；SiliconFlow Qwen3-ASR-1.7B 识别，DeepSeek-V4.1-Flash 润色/优化。",
+    "detail": "README.md"
+  }
+}

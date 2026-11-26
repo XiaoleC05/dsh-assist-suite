@@ -1,0 +1,52 @@
+{
+  "//": "Session M2 (workspace-a): TWO confluence_memory calls — promote the candidate created by M1, then export the portable confluence.memory/v1 document. Promote renders \"Promoted pattern\"; export renders \"Exported long-term memory\".",
+  "default": {
+    "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E memory promoter"
+    },
+    {
+      "when": {
+        "messagesIncludes": "Exported long-term memory"
+      },
+      "text": "Memory promoted and exported."
+    },
+    {
+      "when": {
+        "messagesIncludes": "Promoted pattern"
+      },
+      "toolUse": {
+        "name": "confluence_memory",
+        "input": {
+          "action": "export"
+        }
+      }
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "MOCK_FALLBACK: promote/export did not render; ending the turn."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_memory",
+        "input": {
+          "action": "promote",
+          "key": "e2e.windows-retry"
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}

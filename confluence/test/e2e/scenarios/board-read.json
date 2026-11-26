@@ -1,0 +1,52 @@
+{
+  "//": "Session C (workspace-a, same directory as A/S/P/D): two tool calls — confluence_board list (must show the writer note + the seeded legacy note and a through= marker), then confluence_inbox (must show the queued notice and an inbox= marker). The rules match the rendered wrapper tags, not note/body text, so the passive pulse cannot satisfy them early.",
+  "default": {
+    "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E bus reader"
+    },
+    {
+      "when": {
+        "messagesIncludes": "<confluence-inbox"
+      },
+      "text": "Workspace bus and inbox confirmed."
+    },
+    {
+      "when": {
+        "messagesIncludes": "<confluence-board"
+      },
+      "toolUse": {
+        "name": "confluence_inbox",
+        "input": {
+          "limit": 20
+        }
+      }
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "MOCK_FALLBACK: the board read did not render a board block; ending the turn."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_board",
+        "input": {
+          "action": "list",
+          "limit": 20
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}

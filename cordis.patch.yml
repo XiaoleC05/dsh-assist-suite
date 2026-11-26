@@ -1,0 +1,276 @@
+# dsh-assist-suite — generated aggregation patch.
+# Do not edit by hand: run node scripts/build.mjs after changing a member patch.
+# Members: dsh-confluence, pro-prompt, @local/crisp-quality-gate
+
+# ---- dsh-confluence ----
+# Confluence / 高级记忆 — bundle patch (v0.4.0: workspace bus + long-term memory + persona + style cards)
+#
+# Installing this bundle inserts exactly one Loader row, `confluence`, whose
+# `config` is the complete v3 default configuration. The row mounts the plain
+# ESM host plugin in ./index.js (six tools, two passive prompt contributions,
+# read-only panel routes, opt-in profile import/export) and, when DSH exposes a
+# Web client, the sidebar/panel client in ./client.js.
+#
+# v0.3 product (ADR-0008):
+#   module 1 — workspace session bus: per-workspace keyed context, notes and
+#              addressed messages (queued delivery in the recipient's next-step
+#              pulse and inbox; no wake, no interruption).
+#   module 2 — global user profile: durable facts, injected into every session,
+#              portable via JSON/Markdown export and validated import.
+#   The v0.2 "one global board for every session" framing is retired. v0.2
+#   global board data stays on disk untouched; it is not merged into workspace
+#   views. v0.1 per-workspace journals are read as that workspace's bus.
+#
+# Binding design:
+#   docs/adr/0008-bus-and-profile.md          v0.3 scope decision
+#   docs/plan/v0.3-interfaces.md              binding interface contract
+#   docs/adr/0005-ui-transport.md             read-only panel transport
+#   docs/design/config.md                     configuration contract
+#
+# A user override in the profile's own cordis.patch.yml replaces this complete
+# `config` object rather than deep-merging it. Copy the whole block and change
+# only what you need; ready-made examples: examples/profile-patch.yml.
+- insert:
+    - id: confluence
+      name: 'dsh-assist-suite/confluence'
+      config:
+        # Master switch. false keeps the row mounted but makes every Confluence
+        # feature a no-op.
+        enabled: true
+
+        # Store: profile-local, append-only JSONL journals. One journal directory
+        # per workspace scope plus the global scope (ledger, presence, profile).
+        store:
+          # Empty string = $DSH_HOME/storages/confluence/v1. An absolute path is
+          # accepted but discouraged; relative paths resolve against the
+          # profile's storage area. The plugin never writes inside the workspace.
+          dir: ''
+          # Journal records older than this become eligible for compaction
+          # (export tooling only in v0.3.0; the store never deletes on its own).
+          retentionDays: 90
+          # Maximum serialized size of one note body, in bytes.
+          maxBodyBytes: 8192
+          # Freshness contract: readers poll this often. fs.watch is only an
+          # optimization and must degrade to polling.
+          pollMs: 4000
+          # Best-effort fs.watch acceleration (debounced, try/catch wrapped).
+          watch: true
+          # Journals kept open at once; the least recently used workspace is
+          # closed beyond this. A session only touches its own workspace.
+          maxOpenWorkspaces: 16
+
+        # Module 1 — workspace session bus.
+        bus:
+          enabled: true
+          # Shared state pool: last-write-wins keys per workspace.
+          context:
+            maxKeys: 200
+            maxValueBytes: 8192
+          # Workspace note board (findings, decisions, gotchas, questions,
+          # handoffs, warnings) — append-only, threaded, resolvable.
+          notes:
+            maxEntries: 2000
+          # Addressed peer messages within one workspace. Delivery is queued:
+          # the recipient sees them in its next-step pulse and in
+          # `confluence_inbox`; v0.3.0 never wakes or interrupts a session.
+          messages:
+            maxStored: 500
+            maxBodyBytes: 4096
+          # The passive workspace digest injected as one systemPrompt.context
+          # contribution (byte-stable, bounded).
+          pulse:
+            enabled: true
+            # Hard character cap for the rendered pulse (200-320 token target).
+            maxChars: 1400
+            # Unread messages rendered per step (design maximum 3).
+            maxMessages: 3
+            # Shared-state keys rendered per step (design maximum 3).
+            maxStateKeys: 3
+            # Live same-workspace peers rendered per step.
+            maxPeers: 2
+
+        # Module 2 — global user profile.
+        profile:
+          enabled: true
+          # Inject the profile as a second systemPrompt.context contribution.
+          inject: true
+          # Live facts kept in the global journal.
+          maxFacts: 200
+          # Hard character cap for the injected profile block.
+          maxInjectChars: 1200
+          # Facts below this confidence are not injected into the prompt.
+          minConfidence: 0.3
+          # Maximum serialized size of one fact value, in bytes.
+          maxValueBytes: 1024
+          # Maximum size of an imported/exported profile document, in bytes.
+          maxExportBytes: 65536
+
+        # Long-term memory: generalizable patterns abstracted from tasks.
+        # Global with tags; new patterns enter as candidates until the user
+        # confirms them (the Agent promotes via confluence_memory).
+        memory:
+          enabled: true
+          # Inject the active patterns block into every session.
+          inject: true
+          # Live patterns kept in the global journal (candidates + active).
+          maxPatterns: 300
+          # Patterns rendered per step (relevance-selected).
+          maxInjectPatterns: 5
+          # Hard character cap for the rendered patterns block.
+          maxInjectChars: 1200
+          # A pattern added below this confidence should be proposed as a
+          # candidate rather than trusted (advisory for the model).
+          candidateConfidence: 0.5
+          # candidate: new patterns wait for user confirmation (recommended);
+          # off: the Agent should not record patterns automatically.
+          autoCapture: candidate
+
+        # Style cards: how answers and engineering copy should read.
+        # Two channels: chat (answers) and engineering (commit, comments,
+        # docs, naming, error messages, logs, UI microcopy).
+        style:
+          enabled: true
+          inject: true
+          maxRules: 100
+          maxInjectCharsChat: 600
+          maxInjectCharsEngineering: 900
+
+        # Ledger: metadata-only, live-first session awareness for the profile.
+        ledger:
+          enabled: true
+          # Distinct workspace-relative paths recorded per session.
+          maxFilesPerSession: 8
+          # Session-ledger rows retained in the global journal.
+          maxSessions: 200
+          # File hints are deliberately never rendered in the prompt (privacy).
+          fileHintsInPulse: false
+
+        # Recall: explicit, read-only, literal search over earlier sessions in
+        # the profile through ctx.sessionQuery exact reads.
+        recall:
+          enabled: true
+          # Prior sessions searched per call.
+          maxSessions: 3
+          # Matching events returned per call across sessions.
+          maxHits: 5
+          # Cooperative timeout for one recall call.
+          timeoutMs: 5000
+
+        # Privacy: the DSH profile/machine is the trust boundary (single-user
+        # local). These are best-effort user controls, not a sandbox.
+        privacy:
+          # Redact API keys, tokens, private keys and password-like values.
+          redact: true
+          # Redact titles as well (titles are derived from prompts).
+          redactTitles: true
+          # Glob patterns whose path hints are never recorded.
+          denyPathPatterns:
+            - '**/.env*'
+            - '**/*.pem'
+          # Session ids that never contribute bus rows, profile facts, ledger
+          # rows, pulse text or tools.
+          privateSessions: []
+          # Custom redaction regex sources applied after the built-in secret
+          # patterns. Built-ins cannot be disabled; invalid patterns are dropped
+          # with a warning.
+          redactPatterns: []
+
+        # UI: read-only Web panel (workspace bus views + user profile view).
+        ui:
+          enabled: true
+          # Panel refresh interval while visible.
+          pollMs: 5000
+
+        # Debug: empty string = no debug log file.
+        debug:
+          logFile: ''
+
+# ---- pro-prompt ----
+# pro-prompt (输入增强) — bundle patch.
+#
+# Installing the bundle inserts one loader row. The host half calls SiliconFlow
+# for both ASR (Qwen3-ASR-1.7B) and chat (DeepSeek-V4.1-Flash). The key is
+# supplied through the profile-level config or SILICONFLOW_API_KEY; it is never
+# stored in this package.
+#
+# There is no template library, no prompt history, no audio history, and no
+# key store. Only the default mode may be persisted, through the profile's
+# config editor (the existing configuration file), not a new file.
+#
+# A profile-level override replaces this whole config object rather than
+# deep-merging it, so copy the complete block and change only the fields needed.
+- insert:
+    - id: pro-prompt
+      name: 'dsh-assist-suite/pro-prompt'
+      config:
+        enabled: true
+        # SiliconFlow relay: one key covers ASR and chat. The key is supplied
+        # through the profile-level config (or SILICONFLOW_API_KEY), never here.
+        apiBase: https://api.siliconflow.cn/v1/chat/completions
+        apiKey: ''
+        apiKeyEnvFile: ''
+        apiKeyEnvName: SILICONFLOW_API_KEY
+        # ASR: selected open model on SiliconFlow.
+        asrProvider: siliconflow
+        asrApiBase: https://api.siliconflow.cn/v1
+        asrModel: Qwen/Qwen3-ASR-1.7B
+        # Chat: selected for Chinese polish/optimization after latency/fidelity
+        # comparison (Qwen3.5-9B without thinking, GLM-5.3-Flash, DeepSeek-V4.1-Flash).
+        polishModel: deepseek-ai/DeepSeek-V4.1-Flash
+        language: zh
+        defaultMode: structure
+        maxSeconds: 60
+        speechTimeoutMs: 90000
+        optimizeTimeoutMs: 180000
+        maxPromptChars: 20000
+        maxOutputTokens: 2048
+        polish: true
+
+# ---- @local/crisp-quality-gate ----
+# Crisp quality gate — a Host + Web plugin bundle row.
+# The Web half adds a left-sidebar "质量门禁" entry and a read-only status
+# page served by GET /crisp/status (Host route; browser refresh loads it).
+#
+# Install this bundle into a profile (see docs/integrations/deepseek-harness.md) and the row
+# below is inserted into that profile's effective composition. Change the
+# config here or override it from the profile's own cordis.patch.yml:
+#
+#   - id: crisp-quality-gate
+#     config:
+#       mode: guard
+#
+# mode:
+#   observe (default) — check and log only; never changes the conversation.
+#   guard            — additionally queue exactly ONE user-role followup asking
+#                      for a complete rewrite after a turn whose delivered
+#                      answer was blocked by Crisp. Post-delivery, never a
+#                      pre-delivery block.
+#
+# binaryPath defaults to the checkout's bin/crisp(.exe) when this package runs
+# from the Crisp repository, then to CRISP_BIN, then to "crisp" on PATH.
+# logFile: "" logs the structured lines to stderr; set a path to append JSONL.
+# envPassthrough lists variables copied from the Harness environment into the
+# spawned Crisp process (QUALITY_GATE_* critic settings live there).
+#
+# critic: http (default) keeps the external OpenAI-compatible Critic.
+# Set critic: harness to review with the Harness LLM service instead (no
+# external key; e.g. criticProvider: deepseek-account, criticModel:
+# deepseek-flash, criticReasoningEffort: off, criticTimeoutMs: 15000).
+- insert:
+    - id: crisp-quality-gate
+      name: 'dsh-assist-suite/crisp'
+      disabled: true
+      config:
+        mode: observe
+        timeoutMs: 30000
+        minRunes: 40
+        logFile: ''
+        envPassthrough:
+          - QUALITY_GATE_BASE_URL
+          - QUALITY_GATE_API_KEY
+          - QUALITY_GATE_MODEL
+          - QUALITY_GATE_MODE
+          - QUALITY_GATE_CRITIC_TIMEOUT_MS
+          - QUALITY_GATE_MIN_CRITIC_RUNES
+          - QUALITY_GATE_TOTAL_TIMEOUT_MS
+          - QUALITY_GATE_EXTRA_BODY_JSON

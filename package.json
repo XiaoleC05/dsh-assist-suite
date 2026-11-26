@@ -1,0 +1,44 @@
+{
+  "name": "dsh-assist-suite",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "对话助手套件：长期记忆与工作区总线（Confluence）、输入增强（pro-prompt）、回答质量门禁（Crisp，默认关闭）。一个仓库、一个安装项。",
+  "icon": "icon.svg",
+  "exports": {
+    "./confluence": "./confluence/index.js",
+    "./pro-prompt": "./pro-prompt/index.js",
+    "./crisp": "./crisp/index.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "client.js",
+    "cordis.patch.yml",
+    "confluence",
+    "pro-prompt",
+    "crisp",
+    "locale/*.json",
+    "docs",
+    "icon.svg",
+    "README.md"
+  ],
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar-right",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    }
+  }
+}

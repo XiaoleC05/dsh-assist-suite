@@ -1,0 +1,17 @@
+{
+  "//": "Throwaway warm-up session run once right after the local bundle is installed into a fresh scratch profile. DSH activation is async: absorb the cold start so the acceptance sessions measure the product contract, not activation timing.",
+  "default": {
+    "text": "Warm-up session completed; no tools were needed."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Warm-up session"
+    },
+    {
+      "text": "Warm-up session completed; no tools were needed."
+    }
+  ]
+}

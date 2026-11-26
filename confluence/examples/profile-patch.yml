@@ -1,0 +1,348 @@
+# Confluence / 高级记忆 — example user overrides (v0.4.0: three-layer memory + style cards)
+#
+# These are EXAMPLES for a user's own profile layer
+# ($DSH_HOME/profiles/<profile>/cordis.patch.yml). Nothing here is loaded by the
+# repository, the bundle, or the tests.
+#
+# MODEL (v0.4.0, ADR-0009 extends ADR-0008): three memory layers plus an output side.
+#   workspace bus  — per-workspace keyed state + notes + addressed messages; never
+#                    merged across workspaces. `privacy.privateSessions` hides a
+#                    session from every surface.
+#   long-term memory — `pattern` records generalized from earlier tasks. New
+#                    patterns are stored as `candidate` and are NOT injected until
+#                    `confluence_memory promote` (candidate-confirmation flow);
+#                    `memory.autoCapture` is `candidate` (propose) or `off`.
+#   user persona   — the `profile` record type limited to six persona sections
+#                    (identity, personality, communication, habits, boundaries,
+#                    taste); legacy preferences→communication and rules→boundaries
+#                    fold at read time; legacy tech/context facts migrate once into
+#                    patterns.
+#   style cards    — `style` records in two channels: `chat` (tone/structure of
+#                    answers) and `engineering` (commit/comment/docs/naming/error/
+#                    log/ui copy).
+#
+# Row matching: later layers win per row, and a matching override REPLACES the
+# row's complete `config` object instead of deep-merging it. That is why each
+# example below repeats the full configuration — copy one block and change only
+# the fields you care about. The bundle's own defaults are in
+# ../cordis.patch.yml; the field-by-field contract is docs/design/config.md.
+#
+# Upgrading from v0.3.x: `profile.*` keeps its meaning (persona budgets); add the
+# new `memory`/`style` sections. There are no new deprecations; the v0.3 mappings
+# (`store.maxEntriesPerWorkspace`, top-level `pulse.*`, `export.*`) still warn/map.
+# See docs/upgrade-v0.4.md. A config edit reloads the plugin row; the linked
+# bundle needs a DSH restart to load the new Host modules.
+
+# ---------------------------------------------------------------------------
+# Example 1 — privacy first: explicit private sessions, fewer patterns/style
+# rules injected, and candidate-only memory (never auto-promoted).
+# ---------------------------------------------------------------------------
+- id: confluence
+  name: dsh-confluence
+  config:
+    enabled: true
+    store:
+      dir: ''
+      retentionDays: 30
+      maxBodyBytes: 4096
+      pollMs: 4000
+      watch: true
+      maxOpenWorkspaces: 8
+    bus:
+      enabled: true
+      context:
+        maxKeys: 100
+        maxValueBytes: 4096
+      notes:
+        maxEntries: 500
+      messages:
+        maxStored: 100
+        maxBodyBytes: 2048
+      pulse:
+        enabled: true
+        maxChars: 800
+        maxMessages: 1
+        maxStateKeys: 1
+        maxPeers: 1
+    profile:
+      enabled: true
+      inject: true
+      maxFacts: 100
+      maxInjectChars: 800
+      minConfidence: 0.5
+      maxValueBytes: 512
+      maxExportBytes: 32768
+    memory:
+      enabled: true
+      inject: true
+      maxPatterns: 100
+      maxInjectPatterns: 2
+      maxInjectChars: 600
+      candidateConfidence: 0.6
+      autoCapture: candidate
+    style:
+      enabled: true
+      inject: true
+      maxRules: 30
+      maxInjectCharsChat: 300
+      maxInjectCharsEngineering: 400
+    ledger:
+      enabled: true
+      maxFilesPerSession: 0
+      maxSessions: 50
+      fileHintsInPulse: false
+    recall:
+      enabled: false
+      maxSessions: 1
+      maxHits: 2
+      timeoutMs: 3000
+    privacy:
+      redact: true
+      redactTitles: true
+      redactPatterns: []
+      denyPathPatterns:
+        - '**/.env*'
+        - '**/*.pem'
+        - '**/secrets/**'
+      privateSessions:
+        - 'session-<id-of-a-conversation-to-hide>'
+    ui:
+      enabled: true
+      pollMs: 5000
+    debug:
+      logFile: ''
+
+# ---------------------------------------------------------------------------
+# Example 2 — low noise: keep the tools and the panel, inject nothing
+# automatically. No workspace pulse, no persona block, no memory block, no style
+# block; the agent can still read/write on explicit request.
+# ---------------------------------------------------------------------------
+- id: confluence
+  name: dsh-confluence
+  config:
+    enabled: true
+    store:
+      dir: ''
+      retentionDays: 90
+      maxBodyBytes: 8192
+      pollMs: 4000
+      watch: true
+      maxOpenWorkspaces: 16
+    bus:
+      enabled: true
+      context:
+        maxKeys: 200
+        maxValueBytes: 8192
+      notes:
+        maxEntries: 2000
+      messages:
+        maxStored: 500
+        maxBodyBytes: 4096
+      pulse:
+        enabled: false
+        maxChars: 1400
+        maxMessages: 3
+        maxStateKeys: 3
+        maxPeers: 2
+    profile:
+      enabled: true
+      inject: false
+      maxFacts: 200
+      maxInjectChars: 1200
+      minConfidence: 0.3
+      maxValueBytes: 1024
+      maxExportBytes: 65536
+    memory:
+      enabled: true
+      inject: false
+      maxPatterns: 300
+      maxInjectPatterns: 5
+      maxInjectChars: 1200
+      candidateConfidence: 0.5
+      autoCapture: candidate
+    style:
+      enabled: true
+      inject: false
+      maxRules: 100
+      maxInjectCharsChat: 600
+      maxInjectCharsEngineering: 900
+    ledger:
+      enabled: false
+      maxFilesPerSession: 8
+      maxSessions: 200
+      fileHintsInPulse: false
+    recall:
+      enabled: true
+      maxSessions: 3
+      maxHits: 5
+      timeoutMs: 5000
+    privacy:
+      redact: true
+      redactTitles: true
+      redactPatterns: []
+      denyPathPatterns:
+        - '**/.env*'
+        - '**/*.pem'
+      privateSessions: []
+    ui:
+      enabled: true
+      pollMs: 10000
+    debug:
+      logFile: ''
+
+# ---------------------------------------------------------------------------
+# Example 3 — workspace bus only: disable the three global layers (long-term
+# memory, persona injection, style injection) for users who only want
+# same-directory collaboration. The panel stays readable.
+# ---------------------------------------------------------------------------
+- id: confluence
+  name: dsh-confluence
+  config:
+    enabled: true
+    store:
+      dir: ''
+      retentionDays: 90
+      maxBodyBytes: 8192
+      pollMs: 4000
+      watch: true
+      maxOpenWorkspaces: 16
+    bus:
+      enabled: true
+      context:
+        maxKeys: 200
+        maxValueBytes: 8192
+      notes:
+        maxEntries: 2000
+      messages:
+        maxStored: 500
+        maxBodyBytes: 4096
+      pulse:
+        enabled: true
+        maxChars: 1400
+        maxMessages: 3
+        maxStateKeys: 3
+        maxPeers: 2
+    profile:
+      enabled: false
+      inject: false
+      maxFacts: 200
+      maxInjectChars: 1200
+      minConfidence: 0.3
+      maxValueBytes: 1024
+      maxExportBytes: 65536
+    memory:
+      enabled: false
+      inject: false
+      maxPatterns: 300
+      maxInjectPatterns: 5
+      maxInjectChars: 1200
+      candidateConfidence: 0.5
+      autoCapture: candidate
+    style:
+      enabled: false
+      inject: false
+      maxRules: 100
+      maxInjectCharsChat: 600
+      maxInjectCharsEngineering: 900
+    ledger:
+      enabled: true
+      maxFilesPerSession: 8
+      maxSessions: 200
+      fileHintsInPulse: false
+    recall:
+      enabled: true
+      maxSessions: 3
+      maxHits: 5
+      timeoutMs: 5000
+    privacy:
+      redact: true
+      redactTitles: true
+      redactPatterns: []
+      denyPathPatterns:
+        - '**/.env*'
+        - '**/*.pem'
+      privateSessions: []
+    ui:
+      enabled: true
+      pollMs: 5000
+    debug:
+      logFile: ''
+
+# ---------------------------------------------------------------------------
+# Example 4 — debugging a store/memory/pulse problem on one machine.
+# Faster polling, a dedicated debug log outside the working directory, a custom
+# store directory under DSH_HOME, and only a small injected budget. Keep logFile
+# out of version control and never point it at a directory with session content.
+# ---------------------------------------------------------------------------
+- id: confluence
+  name: dsh-confluence
+  config:
+    enabled: true
+    store:
+      dir: 'C:\Users\<you>\.dsh\storages\confluence\debug-v1'
+      retentionDays: 7
+      maxBodyBytes: 8192
+      pollMs: 1000
+      watch: false
+      maxOpenWorkspaces: 4
+    bus:
+      enabled: true
+      context:
+        maxKeys: 50
+        maxValueBytes: 8192
+      notes:
+        maxEntries: 200
+      messages:
+        maxStored: 100
+        maxBodyBytes: 4096
+      pulse:
+        enabled: true
+        maxChars: 1400
+        maxMessages: 3
+        maxStateKeys: 3
+        maxPeers: 2
+    profile:
+      enabled: true
+      inject: true
+      maxFacts: 200
+      maxInjectChars: 1200
+      minConfidence: 0.3
+      maxValueBytes: 1024
+      maxExportBytes: 65536
+    memory:
+      enabled: true
+      inject: true
+      maxPatterns: 300
+      maxInjectPatterns: 3
+      maxInjectChars: 900
+      candidateConfidence: 0.5
+      autoCapture: candidate
+    style:
+      enabled: true
+      inject: true
+      maxRules: 100
+      maxInjectCharsChat: 400
+      maxInjectCharsEngineering: 600
+    ledger:
+      enabled: true
+      maxFilesPerSession: 8
+      maxSessions: 200
+      fileHintsInPulse: false
+    recall:
+      enabled: true
+      maxSessions: 3
+      maxHits: 5
+      timeoutMs: 5000
+    privacy:
+      redact: true
+      redactTitles: true
+      redactPatterns: []
+      denyPathPatterns:
+        - '**/.env*'
+        - '**/*.pem'
+      privateSessions: []
+    ui:
+      enabled: true
+      pollMs: 5000
+    debug:
+      logFile: 'C:\Users\<you>\.dsh\logs\confluence-debug.log'

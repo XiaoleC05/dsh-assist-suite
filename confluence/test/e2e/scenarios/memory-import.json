@@ -1,0 +1,42 @@
+{
+  "//": "Session I (workspace-a): ONE confluence_memory import call carrying a legacy v0.3 `confluence.profile/v1` document (persona-only). Import must accept the legacy format and render \"Imported … memory record(s)\".",
+  "default": {
+    "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E legacy import"
+    },
+    {
+      "when": {
+        "messagesIncludes": "Imported"
+      },
+      "text": "Legacy profile document imported."
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "MOCK_FALLBACK: the legacy import did not render; ending the turn."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_memory",
+        "input": {
+          "action": "import",
+          "mode": "merge",
+          "data": "{\"format\":\"confluence.profile/v1\",\"version\":1,\"kind\":\"profile\",\"scope\":\"global\",\"generatedAt\":\"2026-01-02T03:04:05.000Z\",\"revision\":\"01J9Z8K4M2000000000000002A\",\"sections\":[{\"id\":\"identity\",\"facts\":[{\"key\":\"e2e.imported\",\"value\":\"imported persona fact\",\"confidence\":0.8,\"source\":\"import\"}]}]}"
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}

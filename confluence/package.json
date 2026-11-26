@@ -1,0 +1,67 @@
+{
+  "name": "dsh-confluence",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Fully-offline DeepSeek Harness plugin (Confluence / 高级记忆): a workspace session bus, candidate-confirmed long-term memory patterns, a portable user persona and two-channel style cards — no network, no model calls.",
+  "author": "XiaoleC05",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XiaoleC05/Confluence.git"
+  },
+  "homepage": "https://github.com/XiaoleC05/Confluence#readme",
+  "bugs": {
+    "url": "https://github.com/XiaoleC05/Confluence/issues"
+  },
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib/*.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "engines": {
+    "node": ">=22.19.0",
+    "dsh": ">=0.2.2-rc.1"
+  },
+  "scripts": {
+    "test": "node --test --test-force-exit \"test/*.test.js\"",
+    "check": "node scripts/check.mjs"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "confluence",
+    "workspace-memory",
+    "session-bus",
+    "long-term-memory",
+    "user-persona",
+    "style-cards",
+    "universal-memory",
+    "offline"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-layout"
+      ]
+    }
+  }
+}

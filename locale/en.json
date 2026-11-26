@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Assistant suite",
+    "description": "One installation entry for long-term memory and the workspace bus (Confluence), input enhancement (pro-prompt), and the answer quality gate (Crisp, off by default).",
+    "detail": "docs/DETAIL.md"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Crisp",
+    "description": "Checks completed assistant answers, can rewrite material answers before delivery in the Web GUI, and serves a live left-sidebar status page."
+  }
+}

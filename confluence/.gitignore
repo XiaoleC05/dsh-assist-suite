@@ -1,0 +1,30 @@
+# Node / pnpm
+node_modules/
+.pnpm-store/
+npm-debug.log*
+pnpm-debug.log*
+*.tgz
+
+# Local scratch state (tests, E2E, DSH_HOME copies)
+.tmp/
+.tmp-*/
+.test-run/
+coverage/
+*.log
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Local exports / private notes (never commit user session content)
+confluence-export/
+*.local.json
+
+# Confluence workspace export (opt-in, local)
+.confluence/

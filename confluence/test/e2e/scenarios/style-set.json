@@ -1,0 +1,46 @@
+{
+  "//": "Session T (workspace-a): ONE confluence_style set call writes an active chat-channel rule; the rendered result says \"Saved style rule … active\". The rule must be injected into later sessions (workspace B session B).",
+  "default": {
+    "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E style writer"
+    },
+    {
+      "when": {
+        "messagesIncludes": "Saved style rule"
+      },
+      "text": "Style rule saved and applied."
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "MOCK_FALLBACK: the style set did not render; ending the turn."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_style",
+        "input": {
+          "action": "set",
+          "channel": "chat",
+          "area": "tone",
+          "key": "e2e.concise",
+          "title": "Concise answers",
+          "rule": "Keep answers short and structured for the E2E harness.",
+          "priority": 80
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}

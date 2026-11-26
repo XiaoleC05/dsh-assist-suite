@@ -1,0 +1,23 @@
+{
+  "//": "Session B (workspace-b, a different directory): NO tool calls. Its passive pulse must not carry workspace-a bus data (isolation) while the profile block must be present (module 2 is profile-global).",
+  "default": {
+    "text": "Hello from the Confluence E2E mock model. No tools were needed."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E isolation pulse session"
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "MOCK_FALLBACK: this session must not call tools."
+    },
+    {
+      "text": "Hello from the Confluence E2E mock model. No tools were needed."
+    }
+  ]
+}

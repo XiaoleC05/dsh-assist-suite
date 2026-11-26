@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Crisp 输出优化",
+    "description": "检查已完成的助手回答，命中 material 问题时可在 Web GUI 中交付前重写，并在左侧栏提供实时状态页。"
+  }
+}

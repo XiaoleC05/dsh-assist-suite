@@ -1,0 +1,36 @@
+{
+  "//": "Session S (workspace-a): ONE confluence_send broadcast message (queue-based: the recipient sees it in its next-step pulse/inbox, nothing is interrupted or woken), then a final text answer.",
+  "default": {
+    "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E message sender"
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "Notice queued; the turn is complete."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_send",
+        "input": {
+          "to": "*",
+          "kind": "notice",
+          "body": "Workspace-bus E2E notice from the offline harness."
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}

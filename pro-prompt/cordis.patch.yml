@@ -1,0 +1,39 @@
+# pro-prompt (输入增强) — bundle patch.
+#
+# Installing the bundle inserts one loader row. The host half calls SiliconFlow
+# for both ASR (Qwen3-ASR-1.7B) and chat (DeepSeek-V4.1-Flash). The key is
+# supplied through the profile-level config or SILICONFLOW_API_KEY; it is never
+# stored in this package.
+#
+# There is no template library, no prompt history, no audio history, and no
+# key store. Only the default mode may be persisted, through the profile's
+# config editor (the existing configuration file), not a new file.
+#
+# A profile-level override replaces this whole config object rather than
+# deep-merging it, so copy the complete block and change only the fields needed.
+- insert:
+    - id: pro-prompt
+      name: pro-prompt
+      config:
+        enabled: true
+        # SiliconFlow relay: one key covers ASR and chat. The key is supplied
+        # through the profile-level config (or SILICONFLOW_API_KEY), never here.
+        apiBase: https://api.siliconflow.cn/v1/chat/completions
+        apiKey: ''
+        apiKeyEnvFile: ''
+        apiKeyEnvName: SILICONFLOW_API_KEY
+        # ASR: selected open model on SiliconFlow.
+        asrProvider: siliconflow
+        asrApiBase: https://api.siliconflow.cn/v1
+        asrModel: Qwen/Qwen3-ASR-1.7B
+        # Chat: selected for Chinese polish/optimization after latency/fidelity
+        # comparison (Qwen3.5-9B without thinking, GLM-5.3-Flash, DeepSeek-V4.1-Flash).
+        polishModel: deepseek-ai/DeepSeek-V4.1-Flash
+        language: zh
+        defaultMode: structure
+        maxSeconds: 60
+        speechTimeoutMs: 90000
+        optimizeTimeoutMs: 180000
+        maxPromptChars: 20000
+        maxOutputTokens: 2048
+        polish: true

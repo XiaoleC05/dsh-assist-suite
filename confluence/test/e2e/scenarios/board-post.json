@@ -1,0 +1,40 @@
+{
+  "//": "Session A (workspace-a): ONE confluence_board call with action=post publishes the workspace-bus note, then a final text answer. Same-workspace peers must see it; a different directory must not.",
+  "default": {
+    "text": "Mock default answer (no matching scenario rule)."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E workspace-bus writer"
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "Workspace note accepted; the turn is complete."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_board",
+        "input": {
+          "action": "post",
+          "kind": "gotcha",
+          "title": "Workspace-bus harness gotcha",
+          "body": "Synthetic workspace-bus note written by the offline Confluence v0.3 E2E harness. Safe to delete.",
+          "tags": [
+            "e2e"
+          ]
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "对话助手套件",
+    "description": "长期记忆与工作区总线（Confluence）、输入增强（pro-prompt）与回答质量门禁（Crisp，默认关闭）的合并安装项。",
+    "detail": "docs/DETAIL.md"
+  }
+}

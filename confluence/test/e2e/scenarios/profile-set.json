@@ -1,0 +1,38 @@
+{
+  "//": "Session P (workspace-a): ONE confluence_profile set call records a v0.4 persona fact (communication section), then a final text answer. The persona lives in the profile-global journal, so a session in another workspace must still get the persona block.",
+  "default": {
+    "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E persona writer"
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "Profile fact accepted; the turn is complete."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_profile",
+        "input": {
+          "action": "set",
+          "section": "communication",
+          "key": "e2e.language",
+          "value": "mock E2E persona language",
+          "confidence": 0.9
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}

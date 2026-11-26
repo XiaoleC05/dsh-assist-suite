@@ -1,0 +1,55 @@
+{
+  "//": "Session D (workspace-a): two confluence_context calls — set e2e.phase=note-posted, then get the same key. The get result renders a <confluence-context> block carrying the posted value; a same-workspace peer reads the shared state pool.",
+  "default": {
+    "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E context session"
+    },
+    {
+      "when": {
+        "messagesIncludes": "<confluence-context"
+      },
+      "text": "Context state confirmed."
+    },
+    {
+      "when": {
+        "messagesIncludes": "Set workspace context key"
+      },
+      "toolUse": {
+        "name": "confluence_context",
+        "input": {
+          "action": "get",
+          "key": "e2e.phase"
+        }
+      }
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "MOCK_FALLBACK: the context get did not return a rendered block; ending the turn."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_context",
+        "input": {
+          "action": "set",
+          "key": "e2e.phase",
+          "value": "note-posted",
+          "valueType": "text"
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}

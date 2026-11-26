@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Confluence / 高级记忆">
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 13c0 10 7 17 17 20" stroke="#4f7fdd" stroke-width="4.5"/>
+    <path d="M53 13c0 10-7 17-17 20" stroke="#7ba5f5" stroke-width="4.5"/>
+    <path d="M32 6v27" stroke="#3f6fd8" stroke-width="4.5"/>
+  </g>
+  <path d="M32 30c-9 2-14 9-14 17 0 6 4 10 10 10h8c6 0 10-4 10-10 0-8-5-15-14-17Z" fill="#2456c7"/>
+  <g stroke="#eaf1ff" stroke-width="2.6" stroke-linecap="round">
+    <path d="M25 44h14"/>
+    <path d="M25 49h8"/>
+  </g>
+</svg>

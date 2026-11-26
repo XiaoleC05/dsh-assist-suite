@@ -1,0 +1,74 @@
+{
+  "name": "pro-prompt",
+  "version": "1.4.0",
+  "private": true,
+  "description": "输入增强（pro-prompt）：为 DeepSeek Harness 输入框提供语音输入与提示词优化。ASR 为 SiliconFlow Qwen3-ASR-1.7B，润色/优化为 SiliconFlow DeepSeek-V4.1-Flash。",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib/*.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE",
+    "docs/*.md"
+  ],
+  "engines": {
+    "node": ">=20",
+    "dsh": ">=0.2.2-rc.1"
+  },
+  "scripts": {
+    "test": "node --test --test-force-exit \"test/*.test.js\"",
+    "check": "node --check index.js && node --check client.js && node --check lib/config.js && node --check lib/key.js && node --check lib/asr.js && node --check lib/errors.js && node --check lib/prompts.js && node --check lib/chat.js && node --check lib/voice.js && node --check lib/optimize.js && node --check lib/routes.js"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "pro-prompt",
+    "prompt-optimizer",
+    "voice-input",
+    "speech-to-text",
+    "qwen3-asr-1.7b",
+    "deepseek-v4.1-flash",
+    "siliconflow",
+    "deepseek"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar-right",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    },
+    "manifestVersion": 1
+  },
+  "author": "XiaoleC05",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XiaoleC05/pro-prompt.git"
+  },
+  "homepage": "https://github.com/XiaoleC05/pro-prompt#readme",
+  "bugs": {
+    "url": "https://github.com/XiaoleC05/pro-prompt/issues"
+  }
+}

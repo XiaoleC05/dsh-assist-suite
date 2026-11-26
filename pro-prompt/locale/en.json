@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "pro-prompt",
+    "description": "Voice input and prompt optimization for the DSH composer: SiliconFlow Qwen3-ASR-1.7B for recognition, DeepSeek-V4.1-Flash for polish and optimization.",
+    "detail": "README.md"
+  }
+}

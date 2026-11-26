@@ -1,0 +1,48 @@
+{
+  "//": "Session M1 (workspace-a): ONE confluence_memory add call. add ALWAYS stores a candidate (never active); the rendered result must say it is NOT active yet.",
+  "default": {
+    "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+  },
+  "responses": [
+    {
+      "when": {
+        "systemIncludes": "concise title"
+      },
+      "text": "Mock E2E memory candidate writer"
+    },
+    {
+      "when": {
+        "messagesIncludes": "Stored candidate pattern"
+      },
+      "text": "Memory candidate accepted; the turn is complete."
+    },
+    {
+      "when": {
+        "hasToolResult": true
+      },
+      "text": "MOCK_FALLBACK: the memory add did not render a candidate; ending the turn."
+    },
+    {
+      "when": {
+        "hasToolResult": false
+      },
+      "toolUse": {
+        "name": "confluence_memory",
+        "input": {
+          "action": "add",
+          "category": "pitfall",
+          "key": "e2e.windows-retry",
+          "title": "Windows rename needs a retry",
+          "body": "Synthetic long-term pattern written by the offline Confluence v0.4 E2E harness; promote only after the user confirms.",
+          "tags": [
+            "e2e"
+          ],
+          "confidence": 0.7
+        }
+      }
+    },
+    {
+      "text": "MOCK_FALLBACK: unexpected request shape; ending the turn."
+    }
+  ]
+}
