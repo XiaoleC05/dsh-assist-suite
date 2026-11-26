@@ -9,6 +9,10 @@
  * under the bundle's package name.
  *
  * Sources live in client-sources/ and are the members' own client files.
+ * Crisp's page is not composed: the quality gate is off by default and the host
+ * side is only applied when config.crisp.enabled is true, so a always-registered
+ * status page would be dead UI. Re-add ./client-sources/crisp.js here if the
+ * gate is turned on permanently.
  *
  * Run after changing any client source:
  *   node scripts/build-client.mjs
@@ -22,7 +26,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const root = dirname(here)
 const packageName = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).name
 
-const SOURCES = ['client-sources/confluence.js', 'client-sources/pro-prompt.js', 'client-sources/crisp.js']
+const SOURCES = ['client-sources/confluence.js', 'client-sources/pro-prompt.js']
 
 /** Capture the factory function text from a module-loader client file. */
 function factoryText(file) {

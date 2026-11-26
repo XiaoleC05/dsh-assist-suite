@@ -109,7 +109,14 @@ async function persistDefaultMode(ctx, mode, log) {
     return { persisted: false, warning: '当前 profile 不支持写入配置；默认模式已在本次运行生效。' };
   }
   try {
-    await editor.edit(entry, current => ({ ...(current || {}), defaultMode: mode }));
+    await editor.edit(entry, current => ({
+      ...(current || {}),
+      proPrompt: {
+        ...(current !== null && typeof current === 'object'
+          && current.proPrompt !== null && typeof current.proPrompt === 'object' ? current.proPrompt : {}),
+        defaultMode: mode,
+      },
+    }));
     return { persisted: true };
   } catch (error) {
     const detail = safeMessage(error instanceof Error ? error.message : error);
