@@ -29,9 +29,10 @@ window.__ModuleLoader__.load({
           '输入框左侧两个按钮：语音输入（转写）与提示词优化（润色 / 结构化）。',
           '面板里可以选择默认优化模式；配置由 profile 提供。',
         ],
-        crispTitle: '质量门禁（Crisp）',
+        crispTitle: '输出质量技能',
         crispBody: [
-          '当前默认关闭，不会对回答做任何评审；需要时在配置里把 crisp.enabled 设为 true。',
+          '技能名 output-quality：交付回答前做输出优化与统一规范（结论先行、结构一致、术语统一、格式规范、未验证项标注）。',
+          '随插件自动加载，不依赖外部可执行文件或额外凭据。',
         ],
       },
       en: {
@@ -50,9 +51,10 @@ window.__ModuleLoader__.load({
           'Two buttons left of the composer: voice input (transcription) and prompt optimization (polish / structure).',
           'The panel lets you pick the default optimization mode; configuration comes from the profile.',
         ],
-        crispTitle: 'Quality gate (Crisp)',
+        crispTitle: 'Output quality skill',
         crispBody: [
-          'Off by default and does not review answers; set crisp.enabled to true in the configuration to turn it on.',
+          'Skill "output-quality": polishes and standardizes answers before delivery (conclusion first, consistent structure and terms, clean formatting, unverified claims marked).',
+          'Loaded with the plugin; it needs no external executable or extra credentials.',
         ],
       },
     }

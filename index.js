@@ -32,6 +32,50 @@ export const Config = z.object({
 
 const RESTART_STATUS_PATH = '/assist-suite/restart/status'
 const RESTART_PATH = '/assist-suite/restart'
+
+/** 输出质量技能正文：对最终回答做优化与统一规范。 */
+const OUTPUT_QUALITY_SKILL = `# 输出优化与统一规范
+
+用于给出最终回答前的润色与自检。目标是让回答清晰、一致、可执行，而不是改变事实或结论。
+
+## 1 结构
+
+- 结论先行：第一段直接回答“做了什么 / 是什么 / 结论是什么”；需要细节时再用小标题或要点展开。
+- 同一段内只讲一件事；并列内容用列表，对比内容用表格，步骤用编号列表。
+- 超过三层嵌套的列表改为小标题；空话、套话、重复结论一律删掉。
+- 长回答先给三行以内的摘要，再给细节；能一句说清就不写三句。
+
+## 2 一致性与术语
+
+- 同一概念全文只用一个名称；首次出现给出中文与英文/缩写，例如“验收关卡（S5）”。
+- 人称与时态统一；中文用全角标点，中英文之间留一个空格，代码、路径、命令用等宽格式。
+- 数字、单位、日期格式全文一致；路径写成可点击的完整相对路径或 \`文件:行\`。
+- 标题层级连续，不跳级；列表标记统一（- 或 1.），不混用。
+
+## 3 格式
+
+- 代码块标注语言；命令块可直接复制执行，不夹带说明文字。
+- 表格列对齐，表头简洁；表格只用于真正的多维对比。
+- 引用外部内容时给出链接；不编造链接、文件名、命令输出。
+- 不建议用表情符号、全大写强调或大量加粗代替结构。
+
+## 4 事实与验证
+
+- 只写本会话真实做过、真实运行过的内容；未验证的结论必须标注“未验证：原因”。
+- 引用工具输出时保留关键数字与退出码；不把推测写成事实。
+- 不删除用户已有的验收标准；不为了好看而改写结论。
+
+## 5 交付前自检
+
+1. 第一段是否直接给出结论？
+2. 每条结论是否都有依据（运行输出、文件位置、来源链接）？
+3. 术语、人称、标点、日期格式是否全文一致？
+4. 是否存在重复段落、空话、未解释的缩写？
+5. 需要用户决策的事项是否已单独列出，并给出推荐项？
+6. 未验证内容是否已标注？
+
+按需只应用与当前回答相关的规则，不要为了“规范”而堆砌模板或把短回答写长。`
+
 const JSON_HEADERS = Object.freeze({
   'content-type': 'application/json; charset=utf-8',
   'cache-control': 'no-store',
@@ -108,6 +152,25 @@ export function apply(ctx, config) {
   const crispConfig = config?.crisp
   if (crispConfig !== null && typeof crispConfig === 'object' && crispConfig.enabled === true) {
     crisp.apply(ctx, crispConfig)
+  }
+
+  // Quality gate as a runtime skill: no external executable, no extra credentials.
+  // Agents load it through the skill tool when they need output polish or a final check.
+  let skills
+  try {
+    skills = ctx.get('skills')
+  } catch {
+    skills = undefined
+  }
+  if (skills !== null && skills !== undefined && typeof skills.register === 'function') {
+    ctx.effect(() => skills.register({
+      name: 'output-quality',
+      description: '输出优化与统一规范：结论先行、结构一致、术语统一、格式与标点规范、未验证断言明确标注。',
+      whenToUse: '给出最终回答前，或需要润色、统一格式与术语、做交付自检时使用。',
+      source: 'runtime',
+      invocation: { modelInvocable: true, userInvocable: true },
+      content: OUTPUT_QUALITY_SKILL,
+    }), 'assist-suite: output quality skill')
   }
 
   const webServer = ctx.webServer
