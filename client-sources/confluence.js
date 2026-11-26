@@ -1432,8 +1432,12 @@ window.__ModuleLoader__.load({
     // factory
     // ------------------------------------------------------------------
 
+    // Pages are rendered as tabs inside the integrated assistant hub.
+    const pages = []
+
     return {
       inject: ['slots', 'locale', 'layout'],
+      pages,
       apply(ctx) {
         const locale = ctx !== null && typeof ctx === 'object' ? ctx.locale : undefined
         if (locale !== null && locale !== undefined && typeof locale.register === 'function') {
@@ -1468,34 +1472,8 @@ window.__ModuleLoader__.load({
             // Presentation-only; never crash the panel.
           }
         }
-        const slots = ctx !== null && typeof ctx === 'object' ? ctx.slots : undefined
-        if (slots === null || slots === undefined || typeof slots.inject !== 'function' || typeof slots.register !== 'function') {
-          return undefined
-        }
-        if (!globalThis.__DSH_SUITE_INTEGRATED_UI) {
-          ctx.slots.inject('sidebar.panellist', () => ctx.slots.register(
-            {
-              name: 'sidebar.panellist',
-              id: 'confluence',
-              order: 30,
-              locale: NS,
-              label: () => t('panel'),
-            },
-            PanelIcon,
-          ))
-        }
-        ctx.slots.inject('main', function* () {
-          yield ctx.slots.register(
-            {
-              name: 'main',
-              key: 'confluence',
-              locale: NS,
-              inject: () => ({ t, closePanel }),
-            },
-            ConfluencePage,
-          )
-        })
-        return undefined
+        // Tab content inside the hub: page component plus the props it needs.
+        pages.push({ id: 'confluence', labelKey: 'panel', locale: NS, component: ConfluencePage, props: () => ({ closePanel }) })
       },
     }
   },

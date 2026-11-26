@@ -1,12 +1,12 @@
 /**
- * 对话助手 — 侧栏入口页（合并客户端的一个 surface）。
+ * 对话助手 — 唯一侧栏入口与主区页（合并客户端的一个 surface）。
  *
- * 侧栏只有这一个助手入口；页面里汇总长期记忆、输入增强与质量门禁，
- * 并可跳转到集成进来的旧页面（高级记忆 / 输入增强）。
+ * 页面内是标签页：概览 + 完全迁移进来的成员页面（高级记忆 / 输入增强）。
+ * 旧插件的独立侧栏图标与独立主区页已不再注册。
  */
 window.__ModuleLoader__.load({
   id: '@local/assist-hub',
-  factory(require) {
+  factory(require, pageSources) {
     const React = require('react')
     const h = React.createElement
     const NS = 'assistHub'
@@ -16,6 +16,7 @@ window.__ModuleLoader__.load({
       zh: {
         panelName: '对话助手',
         subtitle: '长期记忆 · 输入增强 · 质量门禁，一个入口管齐',
+        overviewTab: '概览',
         memoryTitle: '长期记忆（Confluence）',
         memoryBody: [
           '工作区总线：共享状态、便签、跨会话消息（同工作区的会话能看到彼此）。',
@@ -32,12 +33,11 @@ window.__ModuleLoader__.load({
         crispBody: [
           '当前默认关闭，不会对回答做任何评审；需要时在配置里把 crisp.enabled 设为 true。',
         ],
-        openMemory: '打开「高级记忆」',
-        openPrompt: '打开「输入增强」',
       },
       en: {
         panelName: 'Assistant',
         subtitle: 'Long-term memory, input enhancement and a quality gate in one entry',
+        overviewTab: 'Overview',
         memoryTitle: 'Long-term memory (Confluence)',
         memoryBody: [
           'Workspace bus: shared state, notes and cross-session messages within one workspace.',
@@ -54,8 +54,6 @@ window.__ModuleLoader__.load({
         crispBody: [
           'Off by default and does not review answers; set crisp.enabled to true in the configuration to turn it on.',
         ],
-        openMemory: 'Open "Long-term memory"',
-        openPrompt: 'Open "Input enhancement"',
       },
     }
 
@@ -69,39 +67,20 @@ window.__ModuleLoader__.load({
     }
     const listStyle = { margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13, lineHeight: '20px', color: 'var(--dsw-alias-label-secondary)' }
     const titleStyle = { margin: 0, fontSize: 14, lineHeight: '20px', color: 'var(--dsw-alias-label-primary)' }
-    const buttonStyle = {
-      alignSelf: 'flex-start', padding: '6px 12px', borderRadius: 8, cursor: 'pointer',
-      border: '0.5px solid var(--dsw-alias-border-l2)', background: 'var(--dsw-alias-bg-base)',
-      color: 'var(--dsw-alias-label-primary)', fontSize: 13,
-    }
+    const tabStyle = { padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 13, border: '0.5px solid var(--dsw-alias-border-l2)', background: 'transparent', color: 'var(--dsw-alias-label-secondary)' }
+    const tabActiveStyle = { ...tabStyle, background: 'var(--dsw-alias-bg-base)', color: 'var(--dsw-alias-label-primary)', fontWeight: 500 }
 
-    function Card({ title, items, action }) {
+    function Card({ title, items }) {
       return h('section', { style: cardStyle },
         h('h3', { style: titleStyle }, title),
-        h('ul', { style: listStyle }, items.map((text, index) => h('li', { key: index }, text))),
-        action === undefined ? null : action)
+        h('ul', { style: listStyle }, items.map((text, index) => h('li', { key: index }, text))))
     }
 
-    function HubPage(props) {
-      const t = typeof props?.t === 'function' ? props.t : (key) => key
-      const open = (id) => { try { props?.selectPanel?.(id) } catch { /* presentation-only */ } }
-      return h('div', { style: { padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 16, overflow: 'auto', height: '100%', boxSizing: 'border-box' } },
-        h('header', { style: { display: 'flex', flexDirection: 'column', gap: 4 } },
-          h('h1', { style: { margin: 0, fontSize: 20, lineHeight: '28px', color: 'var(--dsw-alias-label-primary)' } }, t('panelName')),
-          h('p', { style: { margin: 0, fontSize: 13, lineHeight: '20px', color: 'var(--dsw-alias-label-secondary)' } }, t('subtitle'))),
-        h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12 } },
-          h(Card, {
-            title: t('memoryTitle'),
-            items: t('memoryBody'),
-            action: h('button', { type: 'button', style: buttonStyle, onClick: () => open('confluence') }, t('openMemory')),
-          }),
-          h(Card, {
-            title: t('promptTitle'),
-            items: t('promptBody'),
-            action: h('button', { type: 'button', style: buttonStyle, onClick: () => open('pro-prompt') }, t('openPrompt')),
-          }),
-          h(Card, { title: t('crispTitle'), items: t('crispBody') })),
-        h('p', { style: { margin: 0, fontSize: 12, color: 'var(--dsw-alias-label-tertiary, var(--dsw-alias-label-secondary))', fontFamily: 'ui-monospace, Consolas, monospace' } }, 'dsh-assist-suite'))
+    function Overview({ t }) {
+      return h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 12, paddingTop: 4 } },
+        h(Card, { title: t('memoryTitle'), items: t('memoryBody') }),
+        h(Card, { title: t('promptTitle'), items: t('promptBody') }),
+        h(Card, { title: t('crispTitle'), items: t('crispBody') }))
     }
 
     function PanelIcon({ size = 16 }) {
@@ -113,22 +92,66 @@ window.__ModuleLoader__.load({
         }))
     }
 
+    function HubPage(props) {
+      const t = typeof props?.t === 'function' ? props.t : (key) => key
+      const tabs = Array.isArray(props?.pageTabs) ? props.pageTabs : []
+      const [active, setActive] = React.useState(-1)
+      const current = active >= 0 ? tabs[active] : null
+      let body
+      if (current === null) {
+        body = h(Overview, { t })
+      } else {
+        let pageProps = {}
+        try { pageProps = current.getProps() } catch { pageProps = { t } }
+        body = h(current.component, pageProps)
+      }
+      return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 } },
+        h('header', { style: { padding: '20px 28px 10px', display: 'flex', flexDirection: 'column', gap: 10, flex: 'none' } },
+          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 2 } },
+            h('h1', { style: { margin: 0, fontSize: 20, lineHeight: '28px', color: 'var(--dsw-alias-label-primary)' } }, t('panelName')),
+            h('p', { style: { margin: 0, fontSize: 13, lineHeight: '20px', color: 'var(--dsw-alias-label-secondary)' } }, t('subtitle'))),
+          h('nav', { role: 'tablist', style: { display: 'flex', gap: 8, flexWrap: 'wrap' } },
+            h('button', { type: 'button', role: 'tab', 'aria-selected': active === -1, style: active === -1 ? tabActiveStyle : tabStyle, onClick: () => setActive(-1) }, t('overviewTab')),
+            tabs.map((tab, index) => h('button', {
+              key: tab.id,
+              type: 'button',
+              role: 'tab',
+              'aria-selected': active === index,
+              style: active === index ? tabActiveStyle : tabStyle,
+              onClick: () => setActive(index),
+            }, tab.label())))),
+        h('div', { role: 'tabpanel', style: { flex: 1, minHeight: 0, overflow: 'auto', padding: '4px 28px 28px' } }, body))
+    }
+
     return {
       inject: ['slots', 'locale', 'layout'],
       apply(ctx) {
-        let selectPanel = () => {}
-        try {
-          const layout = ctx !== null && typeof ctx === 'object' ? ctx.layout : undefined
-          if (layout !== null && layout !== undefined && typeof layout.selectPanel === 'function') {
-            selectPanel = (id) => { layout.selectPanel(id) }
-          }
-        } catch {
-          // Presentation-only.
-        }
-        if (typeof ctx.locale?.register === 'function') {
-          ctx.locale.register(NS, STRINGS)
-        }
+        if (typeof ctx.locale?.register === 'function') ctx.locale.register(NS, STRINGS)
         const t = typeof ctx.locale?.bind === 'function' ? ctx.locale.bind(NS) : (key) => key
+        const pageTabs = []
+        const sources = Array.isArray(pageSources) ? pageSources : []
+        for (const pages of sources) {
+          if (!Array.isArray(pages)) continue
+          for (const page of pages) {
+            if (page === null || typeof page !== 'object' || page.component === undefined) continue
+            let pageT = t
+            try {
+              if (typeof ctx.locale?.bind === 'function' && typeof page.locale === 'string') pageT = ctx.locale.bind(page.locale)
+            } catch {
+              pageT = t
+            }
+            pageTabs.push({
+              id: String(page.id ?? page.labelKey ?? pageTabs.length),
+              label: () => { try { return String(pageT(page.labelKey)) } catch { return String(page.labelKey) } },
+              component: page.component,
+              getProps: () => {
+                let extra = {}
+                try { extra = typeof page.props === 'function' ? (page.props() ?? {}) : {} } catch { extra = {} }
+                return { ...extra, t: pageT }
+              },
+            })
+          }
+        }
         const slots = ctx.slots
         if (slots === null || slots === undefined || typeof slots.register !== 'function') return
         ctx.slots.inject('sidebar.panellist', () => ctx.slots.register(
@@ -137,7 +160,7 @@ window.__ModuleLoader__.load({
         ))
         ctx.slots.inject('main', function* () {
           yield ctx.slots.register(
-            { name: 'main', key: PANEL_ID, locale: NS, inject: () => ({ selectPanel }) },
+            { name: 'main', key: PANEL_ID, locale: NS, inject: () => ({ pageTabs }) },
             HubPage,
           )
         })

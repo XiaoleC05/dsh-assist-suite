@@ -26,7 +26,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const root = dirname(here)
 const packageName = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).name
 
-const SOURCES = ['client-sources/hub-assist.js', 'client-sources/confluence.js', 'client-sources/pro-prompt.js']
+const SOURCES = ['client-sources/confluence.js', 'client-sources/pro-prompt.js', 'client-sources/hub-assist.js']
 
 /** Capture the factory function text from a module-loader client file. */
 function factoryText(file) {
@@ -51,10 +51,10 @@ const out = [
   'window.__ModuleLoader__.load({',
   `  id: ${JSON.stringify(packageName)},`,
   '  factory: require => {',
-  '    // Members keep their main-area pages but not their own sidebar icons.',
-  '    globalThis.__DSH_SUITE_INTEGRATED_UI = true',
+  '    const pageSources = []',
   '    const parts = []',
-  ...parts.map((text, index) => `    parts.push(${text}(require)) // source ${index + 1}`),
+  '    const add = (part) => { if (part === null || part === undefined) return; parts.push(part); if (Array.isArray(part.pages)) pageSources.push(part.pages) }',
+  ...parts.map((text, index) => `    add(${text}(require, pageSources)) // source ${index + 1}`),
   '    const inject = []',
   '    for (const part of parts) for (const name of part.inject ?? []) if (!inject.includes(name)) inject.push(name)',
   '    return {',

@@ -1401,8 +1401,12 @@ window.__ModuleLoader__.load({
     // plugin
     // ------------------------------------------------------------------
 
+    // Pages are rendered as tabs inside the integrated assistant hub.
+    const pages = []
+
     return {
       inject: ['slots', 'locale'],
+      pages,
       __test: {
         encodeWav,
         formatElapsed,
@@ -1438,34 +1442,14 @@ window.__ModuleLoader__.load({
         const studio = createStudio();
         studio.ensureLoaded();
 
-        // Left Sidebar entry + main-area page. The integrated suite hub owns the
-        // single sidebar icon, so the entry is skipped there (the main page stays).
-        if (!globalThis.__DSH_SUITE_INTEGRATED_UI) {
-          ctx.effect(function () {
-            return slots.inject('sidebar.panellist', function () {
-              return slots.register({
-                name: 'sidebar.panellist',
-                id: PLUGIN_ID,
-                order: 35,
-                locale: NS,
-                label: function () { return t('panelTitle'); },
-              }, SparklesIcon);
-            });
-          }, 'pro-prompt:sidebar-entry');
-        }
-
-        ctx.effect(function () {
-          return slots.inject('main', function* () {
-            yield slots.register({
-              name: 'main',
-              key: PLUGIN_ID,
-              locale: NS,
-              inject: function () {
-                return { studio, t };
-              },
-            }, SidebarPanel);
-          });
-        }, 'pro-prompt:main-page');
+        // Tab inside the integrated assistant hub: page component plus its props.
+        pages.push({
+          id: PLUGIN_ID,
+          labelKey: 'panelTitle',
+          locale: NS,
+          component: SidebarPanel,
+          props: function () { return { studio }; },
+        });
 
         // The right-sidebar tab is optional: the left Sidebar entry above is the
         // plugin's primary surface, so a build without the tab service still
