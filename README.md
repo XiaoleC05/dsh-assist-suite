@@ -11,7 +11,8 @@
 | `crisp/` | 原 Crisp 集成目录 | 回答质量门禁（默认关闭） |
 | `client-sources/` | 三个成员各自的 client.js | 合并前的界面源码 |
 | `client.js` | 生成 | 三个界面合成的唯一浏览器模块 |
-| `cordis.patch.yml` | 手写 | 三行 loader（Crisp 行带 `disabled: true`） |
+| `index.js` | — | 包根行的宿主半（空实现）：DSH 只把**包根 Loader 行**当作客户端行，这一行负责发布上面的 `client.js` |
+| `cordis.patch.yml` | 手写 | 四行 loader：包根行 `assist-ui` + 三行成员（Crisp 行带 `disabled: true`） |
 
 ## 安装
 

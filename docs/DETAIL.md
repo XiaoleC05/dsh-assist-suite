@@ -19,4 +19,5 @@
 ## 已知限制
 
 - 三个界面合并在同一个浏览器模块里，任一界面报错会影响整块界面的加载。
+- 本包必须保留包根 Loader 行（`assist-ui`，`name: dsh-assist-suite`）：DSH 只把包根行识别为客户端行，子路径行不会发布浏览器模块；删掉该行会导致所有界面消失。
 - Crisp 依赖本机 `crisp` 可执行文件（`CRISP_BIN` 或 PATH），可用 `critic: harness` 改为复用 DSH 模型。

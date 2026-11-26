@@ -1,6 +1,14 @@
-# dsh-assist-suite — generated aggregation patch.
-# Do not edit by hand: run node scripts/build.mjs after changing a member patch.
-# Members: dsh-confluence, pro-prompt, @local/crisp-quality-gate
+# dsh-assist-suite — 一个 bundle 的完整 loader 行。
+#
+# 包根行（id: assist-ui）只承载本包唯一的浏览器模块：DSH 的 client-modules 只把
+# 包根 Loader 行识别为客户端行（子路径行会被跳过），所以合并后的 client.js 需要
+# 这一行才会被发布。它的宿主半是空的 index.js。
+#
+# 其余三行是成员各自的行，id 与 config 保持原样。
+
+- insert:
+    - id: assist-ui
+      name: 'dsh-assist-suite'
 
 # ---- dsh-confluence ----
 # Confluence / 高级记忆 — bundle patch (v0.4.0: workspace bus + long-term memory + persona + style cards)
