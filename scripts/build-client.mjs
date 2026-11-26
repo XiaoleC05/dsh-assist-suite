@@ -26,7 +26,12 @@ const here = dirname(fileURLToPath(import.meta.url))
 const root = dirname(here)
 const packageName = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).name
 
-const SOURCES = ['client-sources/confluence.js', 'client-sources/pro-prompt.js', 'client-sources/hub-assist.js']
+const SOURCES = [
+  'client-sources/confluence.js',
+  'client-sources/pro-prompt.js',
+  'client-sources/restart-row.js',
+  'client-sources/hub-assist.js',
+]
 
 /** Capture the factory function text from a module-loader client file. */
 function factoryText(file) {
