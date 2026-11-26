@@ -1472,16 +1472,18 @@ window.__ModuleLoader__.load({
         if (slots === null || slots === undefined || typeof slots.inject !== 'function' || typeof slots.register !== 'function') {
           return undefined
         }
-        ctx.slots.inject('sidebar.panellist', () => ctx.slots.register(
-          {
-            name: 'sidebar.panellist',
-            id: 'confluence',
-            order: 30,
-            locale: NS,
-            label: () => t('panel'),
-          },
-          PanelIcon,
-        ))
+        if (!globalThis.__DSH_SUITE_INTEGRATED_UI) {
+          ctx.slots.inject('sidebar.panellist', () => ctx.slots.register(
+            {
+              name: 'sidebar.panellist',
+              id: 'confluence',
+              order: 30,
+              locale: NS,
+              label: () => t('panel'),
+            },
+            PanelIcon,
+          ))
+        }
         ctx.slots.inject('main', function* () {
           yield ctx.slots.register(
             {

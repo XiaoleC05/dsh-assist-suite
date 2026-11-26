@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "对话助手套件：长期记忆与工作区总线（Confluence）、输入增强（pro-prompt）、回答质量门禁（Crisp，默认关闭）。一个仓库、一个安装项。",
+  "description": "对话助手：一个入口汇总长期记忆（Confluence）、输入增强（pro-prompt）与质量门禁（Crisp，默认关闭），并集成三者各自的页面。一个仓库、一个安装项。",
   "icon": "icon.svg",
   "main": "./index.js",
   "exports": {
