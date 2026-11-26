@@ -6,6 +6,7 @@
   "description": "对话助手套件：长期记忆与工作区总线（Confluence）、输入增强（pro-prompt）、回答质量门禁（Crisp，默认关闭）。一个仓库、一个安装项。",
   "icon": "icon.svg",
   "exports": {
+    "./client": "./client.js",
     "./confluence": "./confluence/index.js",
     "./pro-prompt": "./pro-prompt/index.js",
     "./crisp": "./crisp/index.js",
